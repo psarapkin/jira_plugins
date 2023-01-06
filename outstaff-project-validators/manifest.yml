@@ -1,0 +1,21 @@
+modules:
+  jira:workflowValidator:
+    - key: outstaff-project-validators-example-workflow-validator
+      function: main
+      name: outstaff-project-validators
+      description: A Jira workflow validator example.
+  jira:issueAction:
+    - key: outstaff-project-create-project-in-contract-issue-action
+      viewportSize: medium
+      title: "Create Project in Contract"
+      function: createProject
+      displayConditions:
+        issueType: Contract
+        projectKey: OP
+  function:
+    - key: main
+      handler: index.run
+    - key: createProject
+      handler: index.createProject
+app:
+  id: ari:cloud:ecosystem::app/3bb0028f-1ca9-463d-b18f-994fb0a27a8a
