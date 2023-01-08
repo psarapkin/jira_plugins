@@ -57,7 +57,9 @@ const CreateProjectInContract = () => {
             <CheckboxGroup label={"Check something"} name={"checkboxGroup1"}>
                 <Checkbox label={"Test Checkbox"} value={"Test Checkbox"} />
             </CheckboxGroup>
-            <Select label={"Select from List"} name={SelectFromList} children={projects} />
+            <Select label={"Select from List"} name={SelectFromList}>
+                {projects}
+            </Select>
 
         </Form>
       </ModalDialog>
