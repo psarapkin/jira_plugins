@@ -27,22 +27,19 @@ export const run = args => {
   }
 };
 
-const getProjects = async () => {
-    console.log("Entering for getProjects");
-    console.log("Before sending response");
-    const response = await api.asApp().requestJira(route`/rest/api/3/project/search`, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
-
-    return (await response.json()).values.map(project => <Option label={project.name} value={project.id} />);
-
-};
 
 const CreateProjectInContract = () => {
   const [isOpen, setOpen] = useState(true);
-  const [projects] = useState(async() => await getProjects());
+
+  const [projects] = useState(async() => {
+      const response = await api.asApp().requestJira(route`/rest/api/3/project/search`, {
+          headers: {
+              'Accept': 'application/json'
+          }
+      });
+
+      return (await response.json()).values.map(project => <Option label={project.name} value={project.id} />);
+  });
 
   if (!isOpen) {
     return null;
