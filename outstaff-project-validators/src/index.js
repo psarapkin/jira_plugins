@@ -1,5 +1,20 @@
-import ForgeUI, { Select, Form, Option, AdminPage, render, useAction, Checkbox, CheckboxGroup, useState, ModalDialog, IssueContext, Text, IssueAction } from "@forge/ui";
-import {properties, asApp, asUser, route, requestJira} from '@forge/api';
+import ForgeUI, {
+    Select,
+    Form,
+    Option,
+    AdminPage,
+    render,
+    useAction,
+    Checkbox,
+    CheckboxGroup,
+    useState,
+    ModalDialog,
+    IssueContext,
+    Text,
+    IssueAction,
+    Table, Heading
+} from "@forge/ui";
+import api, {properties, asApp, asUser, route, requestJira} from '@forge/api';
 import { view } from '@forge/bridge';
 
 export const run = args => {
@@ -12,8 +27,22 @@ export const run = args => {
   }
 };
 
+const getProjects = async () => {
+    console.log("Entering for getProjects");
+    console.log("Before sending response");
+    const response = await api.asApp().requestJira(route`/rest/api/3/project/search`, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+
+    return (await response.json()).values.map(project => <Option label={project.name} value={project.id} />);
+
+};
+
 const CreateProjectInContract = () => {
-  const [isOpen, setOpen] = useState(true)
+  const [isOpen, setOpen] = useState(true);
+  const [projects] = useState(async() => await getProjects());
 
   if (!isOpen) {
     return null;
@@ -28,10 +57,8 @@ const CreateProjectInContract = () => {
             <CheckboxGroup label={"Check something"} name={"checkboxGroup1"}>
                 <Checkbox label={"Test Checkbox"} value={"Test Checkbox"} />
             </CheckboxGroup>
-            <Select label={"Select from List"} name={SelectFromList}>
-                <Option label={"Some value1"} value={"value1"} defaultSelected={true} />
-                <Option label={"Some value2"} value={"value2"} />
-            </Select>
+            <Select label={"Select from List"} name={SelectFromList} children={projects} />
+
         </Form>
       </ModalDialog>
   );
