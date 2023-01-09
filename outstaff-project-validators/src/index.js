@@ -12,7 +12,7 @@ import ForgeUI, {
     IssueContext,
     Text,
     IssueAction,
-    Table, Heading
+    Table, Heading, TextField
 } from "@forge/ui";
 import api, {properties, asApp, asUser, route, requestJira} from '@forge/api';
 import { view } from '@forge/bridge';
@@ -31,31 +31,51 @@ export const run = args => {
 const CreateProjectInContract = () => {
   const [isOpen, setOpen] = useState(true);
 
-  const [projects] = useState(async() => {
-      const response = await api.asApp().requestJira(route`/rest/api/3/project/search`, {
+  const [issuesFromDocs] = useState(async () => {
+      var bodyData = {
+          "expand": [
+            "names",
+            "schema",
+            "operations"
+          ],
+          "jql": "project = DOC",
+          "maxResults": 50,
+          "fieldsByKeys": false,
+          "fields": [
+            "summary",
+            "status",
+            "assignee"
+          ],
+          "startAt": 0
+        };
+
+      const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
+          method: 'POST',
           headers: {
-              'Accept': 'application/json'
-          }
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyData)
       });
 
-      return (await response.json()).values.map(project => <Option label={project.name} value={project.id} />);
+      return (await response.json()).issues.map(issue => <Option label={issue.fields.summary} value={issue.key} />);
   });
 
   if (!isOpen) {
     return null;
   }
 
-  let SelectFromList = "Select from List";
-  let testCheckbox = "Test checkbox";
+  let issuesFromDocuments = "issuesFromDocuments";
+  let newProjectName = "Project Name";
+  let newProjectKey = "Project Key"
   return (
       <ModalDialog header="Creating Project in Contract" onClose={() => setOpen(false)}>
-        <Text>Here will be parameters for creating project issue type </Text>
         <Form>
-            <CheckboxGroup label={"Check something"} name={"checkboxGroup1"}>
-                <Checkbox label={"Test Checkbox"} value={"Test Checkbox"} />
-            </CheckboxGroup>
-            <Select label={"Select from List"} name={SelectFromList}>
-                {projects}
+            <TextField name={newProjectName} label={newProjectName} />
+            <TextField name={newProjectKey} label={newProjectKey} />
+
+            <Select label={issuesFromDocuments} name={issuesFromDocuments}>
+                {issuesFromDocs}
             </Select>
 
         </Form>
