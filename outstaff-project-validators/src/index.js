@@ -118,7 +118,7 @@ const CreateProjectInContract = () => {
           }
       };
 
-      const response = await api.asUser().requestJira(route`/rest/api/3/issueLink`, {
+      await api.asUser().requestJira(route`/rest/api/3/issueLink`, {
           method: 'POST',
           headers: {
               'Accept': 'application/json',
