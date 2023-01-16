@@ -12,7 +12,7 @@ import ForgeUI, {
     IssueContext,
     Text,
     IssueAction,
-    Table, Heading, TextField
+    Table, Heading, TextField, useProductContext
 } from "@forge/ui";
 import api, {properties, asApp, asUser, route, requestJira} from '@forge/api';
 import { view } from '@forge/bridge';
@@ -30,8 +30,10 @@ export const run = args => {
 
 const CreateProjectInContract = () => {
   const [isOpen, setOpen] = useState(true);
+  let newProjectName = "ProjectName";
 
-  const [issuesFromDocs] = useState(async () => {
+
+    const [issuesFromDocs] = useState(async () => {
       var bodyData = {
           "expand": [
             "names",
@@ -61,22 +63,82 @@ const CreateProjectInContract = () => {
       return (await response.json()).issues.map(issue => <Option label={issue.fields.summary} value={issue.key} />);
   });
 
+
+
+/*
+* Создаем новый проект, параметры
+* ProjectName - имя проекта
+* Link - с типом Parent-Child на Issue с типом контракт
+* */
+
+  const onSubmit = async data => {
+      const context = useProductContext();
+
+      const issueTypeResponse = await api.asApp().requestJira(route`/rest/api/3/issuetype`, {
+          headers: {
+              'Accept': 'application/json'
+          }
+      });
+
+      const projectIssueType = (await issueTypeResponse.json()).filter(issue => issue.name === "Project").shift();
+
+      let createProjectIssueBody = `{
+          "fields": {
+              "summary": "${data.ProjectName}",
+              "project": {
+                  "id": "${context.platformContext.projectId}"
+              },
+              "issuetype": {
+                  "id": "${projectIssueType.id}"
+              },
+              "reporter": {
+                  "id": "${context.accountId}"
+              }
+          }
+      }`;
+
+      const createdProjectIssueResponse = await api.asUser().requestJira(route`/rest/api/3/issue`, {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: createProjectIssueBody
+      });
+
+      let createIssueLinksBody = {
+          "outwardIssue": {
+            "key": context.platformContext.issueKey
+          },
+          "inwardIssue": {
+            "key": (await createdProjectIssueResponse.json()).key
+          },
+          "type": {
+              "name": "Parent Link"
+          }
+      };
+
+      const response = await api.asUser().requestJira(route`/rest/api/3/issueLink`, {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(createIssueLinksBody)
+      });
+
+      setOpen(false);
+  } ;
+
   if (!isOpen) {
     return null;
   }
 
-  let issuesFromDocuments = "issuesFromDocuments";
-  let newProjectName = "Project Name";
-  let newProjectKey = "Project Key"
+
   return (
       <ModalDialog header="Creating Project in Contract" onClose={() => setOpen(false)}>
-        <Form>
+        <Form onSubmit={onSubmit}>
             <TextField name={newProjectName} label={newProjectName} />
-            <TextField name={newProjectKey} label={newProjectKey} />
-
-            <Select label={issuesFromDocuments} name={issuesFromDocuments}>
-                {issuesFromDocs}
-            </Select>
 
         </Form>
       </ModalDialog>

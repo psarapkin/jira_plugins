@@ -21,4 +21,5 @@ app:
   id: ari:cloud:ecosystem::app/3bb0028f-1ca9-463d-b18f-994fb0a27a8a
 permissions:
   scopes:
+    - write:jira-work
     - read:jira-work
