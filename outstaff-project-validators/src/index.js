@@ -17,16 +17,6 @@ import ForgeUI, {
 import api, {properties, asApp, asUser, route, requestJira} from '@forge/api';
 import { view } from '@forge/bridge';
 
-export const run = args => {
-  [issue] = args.issue;
-
-
-  return {
-    result: result,
-    errorMessage: `Issue ${issue.key} is not ready for transition from status ${from.id} to ${to.id}`,
-  }
-};
-
 
 const CreateProjectInContract = () => {
   const [isOpen, setOpen] = useState(true);
@@ -145,8 +135,45 @@ const CreateProjectInContract = () => {
   );
 };
 
+const CreateDeveloperInProject = () => {
+    const [isOpen, setOpen] = useState(true);
+
+    const developers_company = "developers_company";
+    const developer_fio = "developer_fio";
+    const developer_email = "developer_email";
+    const currency = "currency";
+    const rate_buy = "rate_buy";
+    const rate_sell = "rate_sell";
+    const resource_start = "resource_start";
+    const resource_end = "resource_end";
+    const manager_fio = "manager_fio";
+    const manager_email = "manager_email";
+
+    if (!isOpen) {
+        return null;
+    }
+
+    const onSubmit = async data => {
+
+    };
+
+    return (
+      <ModalDialog header={"Creating Developer in Contract"} onClose={() => setOpen(false)}>
+          <Form onSubmit={onSubmit}>
+
+          </Form>
+      </ModalDialog>
+    );
+};
+
 export const createProject = render(
     <IssueAction>
       <CreateProjectInContract />
     </IssueAction>
+);
+
+export const createDeveloper = render(
+  <IssueAction>
+      <CreateDeveloperInProject />
+  </IssueAction>
 );

@@ -12,11 +12,20 @@ modules:
       displayConditions:
         issueType: Contract
         projectKey: OP
+    - key: outstaff-project-create-developer-in-project-issue-action
+      viewportSize: medium
+      title: "Create Developer in Project"
+      function: createDeveloper
+      displayConditions:
+        issueType: Project
+        projectKey: OP
   function:
     - key: main
       handler: index.run
     - key: createProject
       handler: index.createProject
+    - key: createDeveloper
+      handler: index.CreateDeveloper
 app:
   id: ari:cloud:ecosystem::app/3bb0028f-1ca9-463d-b18f-994fb0a27a8a
 permissions:
