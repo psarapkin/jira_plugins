@@ -12,7 +12,7 @@ import ForgeUI, {
     IssueContext,
     Text,
     IssueAction,
-    Table, Heading, TextField, useProductContext
+    Table, Heading, TextField, useProductContext, DatePicker
 } from "@forge/ui";
 import api, {properties, asApp, asUser, route, requestJira} from '@forge/api';
 import { view } from '@forge/bridge';
@@ -149,18 +149,70 @@ const CreateDeveloperInProject = () => {
     const manager_fio = "manager_fio";
     const manager_email = "manager_email";
 
+    const companyDocuments = useState(async () => {
+        var bodyData = `
+            {
+              "expand": [
+                  "names",
+                  "schema",
+                  "operations"
+              ],
+              "jql": "project = DOC and issuetype = Contract",
+              "maxResults": 50,
+              "fieldsByKeys": false,
+              "fields": [
+                "summary",
+                "status",
+                "assignee"
+              ],
+              "startAt": 0
+        }`;
+
+        const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: bodyData
+        });
+
+        return (await response.json()).map(issue => <Option label={issue.fields.summary} value={issue.key} />);
+
+    });
+
+
     if (!isOpen) {
         return null;
     }
 
     const onSubmit = async data => {
+        const context = useProductContext();
 
+
+
+        setOpen(false);
     };
 
     return (
       <ModalDialog header={"Creating Developer in Contract"} onClose={() => setOpen(false)}>
           <Form onSubmit={onSubmit}>
-
+              <Select label={"Select contract from documents"} name={developers_company}>
+                  {companyDocuments}
+              </Select>
+              <TextField name={"Developer FIO"} label={developer_fio} />
+              <TextField name={"Developer Email"} label={developer_email} type={"email"} />
+              <Select label={"Currency"} name={currency}>
+                  <Option label={"RUB"} value={"RUB"} />
+                  <Option label={"USD"} value={"USD"} />
+                  <Option label={"EUR"} value={"EUR"} />
+              </Select>
+              <TextField name={"Buy rate"} label={rate_buy} type={"number"} />
+              <TextField name={"Sell rate"} label={rate_sell} type={"number"} />
+              <DatePicker name={"Resource start"} label={resource_start} />
+              <DatePicker name={"Resource end"} label={resource_end} />
+              <TextField name={"Manager FIO"} label={manager_fio} />
+              <TextField name={"Manager email"} label={manager_email} type={"email"} />
           </Form>
       </ModalDialog>
     );
