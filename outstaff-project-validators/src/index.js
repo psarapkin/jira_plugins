@@ -169,6 +169,7 @@ const CreateDeveloperInProject = () => {
     const developers_company = "developers_company";
     const developer_fio = "developer_fio";
     const developer_email = "developer_email";
+    const developer_role = "developer_role";
     const currency = "currency";
     const rate_buy = "rate_buy";
     const rate_sell = "rate_sell";
@@ -200,6 +201,7 @@ const CreateDeveloperInProject = () => {
 
         const developerFioField = (await fieldsResponse.json()).filter(field => field.name === "Developer FIO").shift();
         const developerEmailField = (await fieldsResponse.json()).filter(field => field.name === "Developer Email").shift();
+        const developerRoleField = (await fieldsResponse.json()).filter(field => field.name === "Developer Role").shift();
         const currencyField = (await fieldsResponse.json()).filter(field => field.name === "Currency").shift();
         const rateBuyField = (await fieldsResponse.json()).filter(field => field.name === "Developer Buy Rate").shift();
         const rateSellField = (await fieldsResponse.json()).filter(field => field.name === "Developer Sell Rate").shift();
@@ -222,6 +224,7 @@ const CreateDeveloperInProject = () => {
               },
               "${developerFioField.id}": "${data.developer_fio}",
               "${developerEmailField.id}": "${data.developer_email}",
+              "${developerRoleField.id}": "${data.developer_role}",
               "${currencyField.id}": {
                 "id": "${data.currency}"
               },
@@ -292,20 +295,21 @@ const CreateDeveloperInProject = () => {
     return (
       <ModalDialog header={"Creating Developer in Contract"} onClose={() => setOpen(false)}>
           <Form onSubmit={onSubmit}>
-              <Select label={"Select contract from documents"} name={developers_company}>
+              <Select label={"Select contract from documents"} name={developers_company} isRequired={true}>
                   {companyDocuments}
               </Select>
-              <TextField label={"Developer FIO"} name={developer_fio} />
-              <TextField label={"Developer Email"} name={developer_email} type={"email"} />
-              <Select label={"Currency"} name={currency}>
+              <TextField label={"Developer FIO"} name={developer_fio} isRequired={true} />
+              <TextField label={"Developer Email"} name={developer_email} type={"email"} isRequired={true} />
+              <TextField label={"Developer Role"} name={developer_role} isRequired={true} />
+              <Select label={"Currency"} name={currency} isRequired={true}>
                   {currencyValues}
               </Select>
-              <TextField label={"Buy rate"} name={rate_buy} type={"number"} />
-              <TextField label={"Sell rate"} name={rate_sell} type={"number"} />
-              <DatePicker label={"Resource start"} name={resource_start} />
-              <DatePicker label={"Resource end"} name={resource_end} />
-              <TextField label={"Manager FIO"} name={manager_fio} />
-              <TextField label={"Manager email"} name={manager_email} type={"email"} />
+              <TextField label={"Buy rate"} name={rate_buy} type={"number"} isRequired={true} />
+              <TextField label={"Sell rate"} name={rate_sell} type={"number"} isRequired={true} />
+              <DatePicker label={"Resource start"} name={resource_start} isRequired={true} />
+              <DatePicker label={"Resource end"} name={resource_end} isRequired={true} />
+              <TextField label={"Manager FIO"} name={manager_fio} isRequired={true} />
+              <TextField label={"Manager email"} name={manager_email} type={"email"} isRequired={true} />
           </Form>
       </ModalDialog>
     );
